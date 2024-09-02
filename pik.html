@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카드 효과</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000; /* 배경을 검은색으로 변경 */
+        }
+        .container {
+            width: 220px; 
+            height: 310px; 
+            transition: all 0.1s;
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer;
+            transform-style: preserve-3d;
+        }
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(105deg,
+            transparent 40%,
+            rgba(255, 219, 112, 0.8) 45%,
+            rgba(132, 50, 255, 0.6) 50%,
+            transparent 54%);
+            filter: brightness(1.1) opacity(0.8);
+            mix-blend-mode: color-dodge;
+            background-size: 150% 150%;
+            background-position: 100%;
+            transition: all 0.1s;
+            backface-visibility: hidden;
+            opacity: 0.8;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            background-image: url('pika.png'); /* 이미지 경로 수정 */
+            background-size: cover;
+            backface-visibility: hidden;
+            transition: transform 1.0s;
+        }
+        .expanded {
+            transform: scale(1.5) rotateY(1080deg);
+            animation: glow 1.5s infinite; /* 확대 시 빛나는 애니메이션 추가 */
+        }
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 219, 112, 1), 0 0 60px rgba(132, 50, 255, 1);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="cardContainer">
+        <div class="overlay" id="overlay"></div>
+        <div class="card" id="card"></div>
+    </div>
+
+    <script>
+        var container = document.getElementById('cardContainer');
+        var overlay = document.getElementById('overlay');
+        var card = document.getElementById('card');
+        var expanded = false;
+
+        container.addEventListener('mousemove', function(e) {
+            var rect = container.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            var rotateY = -1 / 5 * x + 20;
+            var rotateX = 4 / 30 * y - 20;
+
+            overlay.style.backgroundPosition = `${x / 5 + y / 5}%`;
+            overlay.style.filter = `opacity(${x / 200}) brightness(1.2)`;
+            overlay.style.opacity = expanded ? '0' : '1.2';
+
+            container.style.transform = `perspective(350px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        container.addEventListener('mouseout', function() {
+            overlay.style.opacity = expanded ? '0' : '1.2';
+            container.style.transform = 'perspective(350px) rotateY(0deg) rotateX(0deg)';
+        });
+
+        container.addEventListener('click', function() {
+            expanded = !expanded;
+            if (expanded) {
+                card.classList.add('expanded');
+                overlay.style.opacity = '0'; // 클릭 시 오버레이 숨기기
+            } else {
+                card.classList.remove('expanded');
+                overlay.style.opacity = '0'; // 축소 중에도 오버레이 숨기기
+                
+               
+                card.style.transition = 'transform 0.5s ease'; // 축소 시 부드러운 전환 효과
+            }
+        });
+    </script>
+</body>
+</html>
